@@ -157,7 +157,11 @@ padding:18px;
 overflow-wrap:anywhere;
 }
 
-.qr img{max-width:100%;width:260px;height:auto}
+.qr img{
+max-width:100%;
+width:260px;
+height:auto;
+}
 
 .center{text-align:center}
 
@@ -198,15 +202,6 @@ font-weight:700;
 cursor:pointer;
 }
 
-.notice{
-border:1px solid var(--g);
-padding:12px;
-border-radius:10px;
-color:var(--g);
-font-size:13px;
-line-height:1.5;
-}
-
 .demoNotice{
 border:1px solid var(--green);
 border-radius:10px;
@@ -214,7 +209,7 @@ padding:12px;
 color:var(--green);
 font-size:12px;
 line-height:1.6;
-margin-top:12px;
+margin:12px 0;
 }
 
 body.logged-out footer{display:none!important}
@@ -291,7 +286,13 @@ autocomplete="current-password">
 <!-- HOME -->
 <section id="home" class="panel hidden">
 <h1>HOME</h1>
+
+<div class="demoNotice">
+DEMO VERSION – This platform is for demonstration purposes.
+</div>
+
 <p>Welcome to AstralLink Gaming Zone.</p>
+
 <button class="btn" onclick="show('packages')">
 VIEW PACKAGES
 </button>
@@ -448,7 +449,7 @@ For payment information, contact support.
 
 <div class="qr">
 <img src="IMG-20261009-WA0016.jpg.jpg"
-alt="Demo QR code"
+alt="QR code"
 onerror="this.style.display='none';document.getElementById('qrf').classList.remove('hidden')">
 
 <div id="qrf" class="hidden">
@@ -520,8 +521,8 @@ and valid before submitting.
 
 <button class="btn" type="submit">SAVE</button>
 
-<p class="muted hidden" id="msg" role="status">
-First withdrawal minimum 10,000.
+<p class="muted hidden" id="msg">
+Bank details are not submitted to a server.
 </p>
 
 </form>
@@ -555,12 +556,15 @@ astragamingtrade@gmail.com
 <button data-p="home" onclick="show('home')">
 <span>⌂</span>Home
 </button>
+
 <button data-p="packages" onclick="show('packages')">
 <span>♛</span>Packages
 </button>
+
 <button data-p="account" onclick="show('account')">
 <span>♙</span>Account
 </button>
+
 <button data-p="support" onclick="show('support')">
 <span>✉</span>Support
 </button>
@@ -568,7 +572,7 @@ astragamingtrade@gmail.com
 
 <script>
 
-const PASSWORD='9583';
+const PASSWORD='5432190';
 const STORAGE_KEY='astralink_wallet_demo_v7';
 
 const packageInfo={
@@ -585,36 +589,37 @@ let withdrawWalletBalance=0;
 let activeItems=[];
 let expiredItems=[];
 
-// LOAD PACKAGE
+// LOAD PACKAGE RECORD
 function loadState(){
 
 try{
+
 const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));
 
 if(saved && Array.isArray(saved.activeItems)){
 activeItems=saved.activeItems;
 }else{
 activeItems=[{
-id:'package 3000',
+id:'package-3000',
 number:2,
 amount:3000,
 value:15000,
 days:3,
-purchaseDate:Date.now(),
-demo:true
+purchaseDate:Date.now()
 }];
 }
 
 }catch(e){
+
 activeItems=[{
-id:'package 3000',
+id:'package-3000',
 number:2,
 amount:3000,
 value:15000,
 days:3,
-purchaseDate:Date.now(),
-demo:true
+purchaseDate:Date.now()
 }];
+
 }
 
 expiredItems=[];
@@ -647,6 +652,7 @@ return;
 loggedIn=true;
 document.getElementById('err').textContent='';
 show('home');
+
 }
 
 // NAVIGATION
@@ -686,6 +692,7 @@ renderPackages();
 if(id==='account'){
 updateBalance();
 }
+
 }
 
 // BUY PACKAGE
@@ -699,7 +706,8 @@ if(!p)return;
 const message=document.getElementById('walletError'+n);
 
 if(message){
-message.textContent=';
+message.textContent=
+'Insufficient balance. Please add funds to continue.';
 message.classList.remove('hidden');
 }
 
@@ -721,7 +729,8 @@ const expiredList=document.getElementById('expiredList');
 
 if(activeItems.length===0){
 
-activeList.innerHTML='<p class="muted">No active packages yet.</p>';
+activeList.innerHTML=
+'<p class="muted">No active packages yet.</p>';
 
 }else{
 
@@ -734,18 +743,17 @@ return `
 
 <div class="top">
 <h2>♛ PACKAGE ${item.number}</h2>
-<span class="activeTag">● ACTIVE </span>
+<span class="activeTag">● ACTIVE</span>
 </div>
 
 <p>Pay Amount: ₹${item.amount.toLocaleString('en-IN')}</p>
+
 <p>Package Value: ₹${item.value.toLocaleString('en-IN')}</p>
+
 <p>Duration: ${item.days} Days</p>
 
 <div class="recordTime">
-Activated: ${date.toLocaleString('en-IN')}
-</div>
-
-<div class="Notice">
+Activation Date: ${date.toLocaleString('en-IN')}
 </div>
 
 </div>
@@ -777,9 +785,11 @@ return false;
 function logout(){
 
 loggedIn=false;
+
 document.getElementById('pass').value='';
 document.getElementById('email').value='';
 document.getElementById('err').textContent='';
+
 show('login');
 
 }
