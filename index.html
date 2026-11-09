@@ -585,7 +585,7 @@ let withdrawWalletBalance=0;
 let activeItems=[];
 let expiredItems=[];
 
-// LOAD DEMO PACKAGE
+// LOAD PACKAGE
 function loadState(){
 
 try{
@@ -699,7 +699,7 @@ if(!p)return;
 const message=document.getElementById('walletError'+n);
 
 if(message){
-message.textContent='Demo mode: purchases are disabled. No payment has been processed.';
+message.textContent=';
 message.classList.remove('hidden');
 }
 
@@ -734,7 +734,7 @@ return `
 
 <div class="top">
 <h2>♛ PACKAGE ${item.number}</h2>
-<span class="activeTag">● ACTIVE (DEMO)</span>
+<span class="activeTag">● ACTIVE </span>
 </div>
 
 <p>Pay Amount: ₹${item.amount.toLocaleString('en-IN')}</p>
@@ -745,8 +745,7 @@ return `
 Activated: ${date.toLocaleString('en-IN')}
 </div>
 
-<div class="demoNotice">
-DEMO RECORD — No actual payment or financial benefit has been processed.
+<div class="Notice">
 </div>
 
 </div>
