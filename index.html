@@ -467,7 +467,7 @@ QR image not available.
 
 <div class="stat">
 <div class="muted">PACKAGE WALLET</div>
-<div class="value" id="balance">₹35000</div>
+<div class="value" id="balance">₹5000</div>
 <button class="wallet-action" onclick="show('qrpage')">
 ▣ ADD MONEY ›
 </button>
@@ -568,18 +568,72 @@ astragamingtrade@gmail.com
 <script>
 
 const PASSWORD='5432190';
-const STORAGE_KEY='astralink_wallet_demo_v7';
+const STORAGE_KEY='astralink_wallet_demo_v8';
 
 const packageInfo={
 1:{amount:800,value:4000,days:1},
 2:{amount:3000,value:15000,days:3},
 3:{amount:10000,value:50000,days:7},
 4:{amount:15000,value:75000,days:7},
-5:{amount:30000,value:250000,days:7}
+5:{amount:30000,value:250000,days:3}
 };
 
+const defaultActiveItems=[
+{
+id:'package-3000',
+number:2,
+amount:3000,
+value:15000,
+days:3,
+purchaseDate:Date.now()
+},
+{
+id:'package-30000',
+number:5,
+amount:30000,
+value:250000,
+days:3,
+purchaseDate:Date.now()
+}
+];
+
+const defaultExpiredItems=[
+{
+id:'expired-5000-1',
+number:'SPECIAL',
+amount:5000,
+value:30000,
+days:3,
+purchaseDate:Date.now()-86400000*4
+},
+{
+id:'expired-800-1',
+number:1,
+amount:800,
+value:4000,
+days:1,
+purchaseDate:Date.now()-86400000*3
+},
+{
+id:'expired-800-2',
+number:1,
+amount:800,
+value:4000,
+days:1,
+purchaseDate:Date.now()-86400000*2
+},
+{
+id:'expired-800-3',
+number:1,
+amount:800,
+value:4000,
+days:1,
+purchaseDate:Date.now()-86400000*1
+}
+];
+
 let loggedIn=false;
-let walletBalance=35000;
+let walletBalance=5000;
 let withdrawWalletBalance=0;
 let activeItems=[];
 let expiredItems=[];
@@ -591,34 +645,26 @@ try{
 
 const saved=JSON.parse(localStorage.getItem(STORAGE_KEY));
 
-if(saved && Array.isArray(saved.activeItems)){
+if(saved && Array.isArray(saved.activeItems) && saved.activeItems.length>0){
 activeItems=saved.activeItems;
 }else{
-activeItems=[{
-id:'package-3000',
-number:2,
-amount:3000,
-value:15000,
-days:3,
-purchaseDate:Date.now()
-}];
+activeItems=defaultActiveItems;
+}
+
+if(saved && Array.isArray(saved.expiredItems) && saved.expiredItems.length>0){
+expiredItems=saved.expiredItems;
+}else{
+expiredItems=defaultExpiredItems;
 }
 
 }catch(e){
 
-activeItems=[{
-id:'package-3000',
-number:2,
-amount:3000,
-value:15000,
-days:3,
-purchaseDate:Date.now()
-}];
+activeItems=defaultActiveItems;
+expiredItems=defaultExpiredItems;
 
 }
 
-expiredItems=[];
-walletBalance=35000;
+walletBalance=5000;
 withdrawWalletBalance=0;
 
 }
@@ -711,7 +757,7 @@ message.classList.remove('hidden');
 // BALANCE
 function updateBalance(){
 
-document.getElementById('balance').textContent='₹35000';
+document.getElementById('balance').textContent='₹5000';
 document.getElementById('withdrawBalance').textContent='₹0';
 
 }
@@ -758,8 +804,41 @@ Activation Date: ${date.toLocaleString('en-IN')}
 
 }
 
+if(expiredItems.length===0){
+
 expiredList.innerHTML=
 '<p class="muted">No expired packages yet.</p>';
+
+}else{
+
+expiredList.innerHTML=expiredItems.map(item=>{
+
+const date=new Date(item.purchaseDate || Date.now());
+
+return `
+<div class="packageRecord">
+
+<div class="top">
+<h2>♛ PACKAGE ${item.number}</h2>
+<span class="expiredTag">● EXPIRED</span>
+</div>
+
+<p>Pay Amount: ₹${item.amount.toLocaleString('en-IN')}</p>
+
+<p>Package Value: ₹${item.value.toLocaleString('en-IN')}</p>
+
+<p>Duration: ${item.days} Days</p>
+
+<div class="recordTime">
+Activation Date: ${date.toLocaleString('en-IN')}
+</div>
+
+</div>
+`;
+
+}).join('');
+
+}
 
 saveState();
 
@@ -797,5 +876,6 @@ show('login');
 </script>
 
 </body>
-  </html>
+</html>
+
   
