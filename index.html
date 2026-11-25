@@ -1,4 +1,8 @@
-
+Aapke code me 2 JavaScript Syntax Errors the jiski wajah se poora <script> block crash ho raha tha aur login button ya koi bhi page open nahi ho raha tha:
+ * Line 473 (packageInfo me): value:250,000 me comma (,) laga hua tha (250000 hona chahiye), jisse JavaScript object break ho gaya.
+ * Line 519 (loadState() me): withdrawWalletBalance=; likha tha (value 0 missing thi), jisse syntax error aa gaya.
+Maine in dono errors ko fix kar diya hai, Package Wallet me ₹35,000 aur Withdraw Wallet me ₹0 set kar diya hai, aur aapka password (5432190) bilkul same rakha hai.
+Yahan aapka poora corrected code hai:
 <!doctype html>
 <html lang="en">
 <head>
@@ -576,7 +580,7 @@ const packageInfo={
 2:{amount:3000,value:15000,days:3},
 3:{amount:10000,value:50000,days:7},
 4:{amount:15000,value:75000,days:7},
-5:{amount:30000,value:250,000,days:7}
+5:{amount:30000,value:250000,days:7}
 };
 
 let loggedIn=false;
@@ -620,7 +624,7 @@ purchaseDate:Date.now()
 
 expiredItems=[];
 walletBalance=35000;
-withdrawWalletBalance=;
+withdrawWalletBalance=0;
 
 }
 
@@ -798,5 +802,5 @@ show('login');
 </script>
 
 </body>
-  </html>
-  
+</html>
+
