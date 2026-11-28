@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -475,7 +476,7 @@ QR image not available.
 
 <div class="stat">
 <div class="muted">WITHDRAW WALLET</div>
-<div class="value" id="withdrawBalance">₹0</div>
+<div class="value" id="withdrawBalance">₹265000</div>
 <button class="wallet-action" onclick="show('withdrawalHistory')">
 ▤ WITHDRAWAL HISTORY ›
 </button>
@@ -568,7 +569,7 @@ astragamingtrade@gmail.com
 <script>
 
 const PASSWORD='5432190';
-const STORAGE_KEY='astralink_wallet_demo_v8';
+const STORAGE_KEY='astralink_wallet_demo_v9';
 
 const packageInfo={
 1:{amount:800,value:4000,days:1},
@@ -580,12 +581,23 @@ const packageInfo={
 
 const defaultActiveItems=[
 {
+id:'package-800-active',
+number:1,
+amount:800,
+value:4000,
+days:1,
+purchaseDate:Date.now()
+}
+];
+
+const defaultExpiredItems=[
+{
 id:'package-3000',
 number:2,
 amount:3000,
 value:15000,
 days:3,
-purchaseDate:Date.now()
+purchaseDate:Date.now()-86400000*3
 },
 {
 id:'package-30000',
@@ -593,11 +605,8 @@ number:5,
 amount:30000,
 value:250000,
 days:3,
-purchaseDate:Date.now()
-}
-];
-
-const defaultExpiredItems=[
+purchaseDate:Date.now()-86400000*3
+},
 {
 id:'expired-5000-1',
 number:'SPECIAL',
@@ -634,7 +643,7 @@ purchaseDate:Date.now()-86400000*1
 
 let loggedIn=false;
 let walletBalance=5000;
-let withdrawWalletBalance=0;
+let withdrawWalletBalance=265000;
 let activeItems=[];
 let expiredItems=[];
 
@@ -665,7 +674,7 @@ expiredItems=defaultExpiredItems;
 }
 
 walletBalance=5000;
-withdrawWalletBalance=0;
+withdrawWalletBalance=265000;
 
 }
 
@@ -758,7 +767,7 @@ message.classList.remove('hidden');
 function updateBalance(){
 
 document.getElementById('balance').textContent='₹5000';
-document.getElementById('withdrawBalance').textContent='₹0';
+document.getElementById('withdrawBalance').textContent='₹265000';
 
 }
 
