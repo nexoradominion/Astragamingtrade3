@@ -516,9 +516,7 @@ and valid before submitting.
 
 <button class="btn" type="submit">SAVE</button>
 
-<p class="muted hidden" id="msg">
-First withdrawal minimum 10,000.
-</p>
+<p class="muted hidden" id="msg"></p>
 
 </form>
 </div>
@@ -528,35 +526,7 @@ First withdrawal minimum 10,000.
 <section id="withdrawalHistory" class="panel hidden">
 <h1>WITHDRAWAL HISTORY</h1>
 <p class="muted">Your withdrawal transaction records.</p>
-
-<div class="packageRecord">
-<div class="top">
-<h2>₹30,000</h2>
-<span class="successfulTag">● SUCCESSFUL</span>
-</div>
-<p>Account Holder: Sk Talib</p>
-<p>Bank Name: SBI</p>
-<p>Account Number: 44902228027</p>
-<p>IFSC Code: SBIN0012060</p>
-<div class="recordTime">
-Withdrawal Date: 16 Nov 2026, 02:15 PM
-</div>
-</div>
-
-<div class="packageRecord">
-<div class="top">
-<h2>₹12,000</h2>
-<span class="successfulTag">● SUCCESSFUL</span>
-</div>
-<p>Account Holder: Sk Talib</p>
-<p>Bank Name: SBI</p>
-<p>Account Number: 44902228027</p>
-<p>IFSC Code: SBIN0012060</p>
-<div class="recordTime">
-Withdrawal Date: 10 Nov 2026, 11:40 AM
-</div>
-</div>
-
+<div id="withdrawalList"></div>
 <button class="btn secondary" onclick="show('account')">
 ← BACK TO ACCOUNT
 </button>
@@ -596,7 +566,7 @@ astragamingtrade@gmail.com
 <script>
 
 const PASSWORD='5432190';
-const STORAGE_KEY='astralink_wallet_demo_v9';
+const STORAGE_KEY='astralink_wallet_demo_v10';
 
 const packageInfo={
 1:{amount:800,value:4000,days:1},
@@ -668,13 +638,35 @@ purchaseDate:Date.now()-86400000*1
 }
 ];
 
+const defaultWithdrawals=[
+{
+amount:30000,
+holder:'Sk Talib',
+bankName:'SBI',
+account:'44902228027',
+ifsc:'SBIN0012060',
+status:'SUCCESSFUL',
+date:'16 Nov 2026, 02:15 PM'
+},
+{
+amount:12000,
+holder:'Sk Talib',
+bankName:'SBI',
+account:'44902228027',
+ifsc:'SBIN0012060',
+status:'SUCCESSFUL',
+date:'10 Nov 2026, 11:40 AM'
+}
+];
+
 let loggedIn=false;
 let walletBalance=5000;
 let withdrawWalletBalance=265000;
 let activeItems=[];
 let expiredItems=[];
+let withdrawalItems=[];
 
-// LOAD PACKAGE RECORD
+// LOAD STATE
 function loadState(){
 
 try{
@@ -693,15 +685,28 @@ expiredItems=saved.expiredItems;
 expiredItems=defaultExpiredItems;
 }
 
+if(saved && Array.isArray(saved.withdrawalItems) && saved.withdrawalItems.length>0){
+withdrawalItems=saved.withdrawalItems;
+}else{
+withdrawalItems=defaultWithdrawals;
+}
+
+if(saved && typeof saved.withdrawWalletBalance==='number'){
+withdrawWalletBalance=saved.withdrawWalletBalance;
+}else{
+withdrawWalletBalance=265000;
+}
+
 }catch(e){
 
 activeItems=defaultActiveItems;
 expiredItems=defaultExpiredItems;
+withdrawalItems=defaultWithdrawals;
+withdrawWalletBalance=265000;
 
 }
 
 walletBalance=5000;
-withdrawWalletBalance=265000;
 
 }
 
@@ -710,7 +715,9 @@ function saveState(){
 try{
 localStorage.setItem(STORAGE_KEY,JSON.stringify({
 activeItems,
-expiredItems
+expiredItems,
+withdrawalItems,
+withdrawWalletBalance
 }));
 }catch(e){}
 
@@ -766,6 +773,10 @@ if(id==='activePackages'||id==='expiredPackages'){
 renderPackages();
 }
 
+if(id==='withdrawalHistory'){
+renderWithdrawals();
+}
+
 if(id==='account'){
 updateBalance();
 }
@@ -793,8 +804,8 @@ message.classList.remove('hidden');
 // BALANCE
 function updateBalance(){
 
-document.getElementById('balance').textContent='₹5000';
-document.getElementById('withdrawBalance').textContent='₹265000';
+document.getElementById('balance').textContent='₹'+walletBalance;
+document.getElementById('withdrawBalance').textContent='₹'+withdrawWalletBalance;
 
 }
 
@@ -880,12 +891,78 @@ saveState();
 
 }
 
-// BANK DETAILS
+// RENDER WITHDRAWALS
+function renderWithdrawals(){
+
+const list=document.getElementById('withdrawalList');
+
+if(withdrawalItems.length===0){
+list.innerHTML='<p class="muted center">No withdrawal records yet.</p>';
+return;
+}
+
+list.innerHTML=withdrawalItems.map(item=>{
+
+const tagClass=item.status==='PROCESSING'?'processingTag':'successfulTag';
+
+return `
+<div class="packageRecord">
+<div class="top">
+<h2>₹${item.amount.toLocaleString('en-IN')}</h2>
+<span class="${tagClass}">● ${item.status}</span>
+</div>
+<p>Account Holder: ${item.holder}</p>
+<p>Bank Name: ${item.bankName}</p>
+<p>Account Number: ${item.account}</p>
+<p>IFSC Code: ${item.ifsc}</p>
+<div class="recordTime">
+Withdrawal Date: ${item.date}
+</div>
+</div>
+`;
+
+}).join('');
+
+}
+
+// BANK DETAILS & WITHDRAWAL PROCESSING
 function saveBankDetails(e){
 
 e.preventDefault();
 
-document.getElementById('msg').classList.remove('hidden');
+const msg=document.getElementById('msg');
+msg.classList.remove('hidden');
+
+if(withdrawWalletBalance<10000){
+msg.style.color='var(--red)';
+msg.textContent='Insufficient balance. Minimum ₹10,000 required for withdrawal.';
+return false;
+}
+
+const holder=document.getElementById('holder').value.trim();
+const bankName=document.getElementById('bankName').value.trim();
+const account=document.getElementById('bank').value.trim();
+const ifsc=document.getElementById('ifsc').value.trim();
+
+const withdrawAmount=withdrawWalletBalance;
+withdrawWalletBalance=0;
+
+withdrawalItems.unshift({
+amount:withdrawAmount,
+holder:holder,
+bankName:bankName,
+account:account,
+ifsc:ifsc,
+status:'PROCESSING',
+date:new Date().toLocaleString('en-IN')
+});
+
+updateBalance();
+renderWithdrawals();
+saveState();
+
+msg.style.color='var(--orange)';
+msg.textContent='Withdrawal request of ₹'+withdrawAmount.toLocaleString('en-IN')+' is now processing.';
 
 return false;
 
@@ -906,6 +983,7 @@ show('login');
 
 // INITIALIZE
 renderPackages();
+renderWithdrawals();
 updateBalance();
 show('login');
 
